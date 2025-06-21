@@ -35,7 +35,7 @@ export const useRiskData = () => {
 
       try {
         const response = await axios.get(`${API_BASE_URL}/layovers/${encodeURIComponent(company)}`);
-        const backendData = response.date[0];
+        const backendData = response.data[0];
         const riskData: RiskData = {
           company: backendData.company_name,
           risk: backendData.risk_level,
@@ -59,7 +59,7 @@ export const useRiskData = () => {
 
         const mockData: RiskData = {
           company: company,
-          risk: Math.floor(Math.random() * 100),
+          risk: 0,
           top_factors: [
             { name: "Executive exits", value: 0.34 },
             { name: "Layoff-intent news", value: 0.28 },
