@@ -1,8 +1,9 @@
 import anthropic
+import os
 
 client = anthropic.Anthropic(
   # defaults to os.environ.get("ANTHROPIC_API_KEY")
-  api_key="my_api_key",
+  api_key=os.getenv("CLAUDE_KEY"),
 )
 
 message_batch = client.messages.batches.create(
