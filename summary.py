@@ -6,30 +6,23 @@ import time
 load_dotenv()
 
 client = anthropic.Anthropic(
-  api_key=os.getenv("ANTHROPIC_API_KEY"),
+  api_key=os.getenv("CLAUDE_KEY"),
 )
 
 header = """
-You are analyzing layoff risk for companies. You'll receive a risk_level (0 - 100 scale) and company features.
+You are analyzing layoff risk for companies. You'll receive a risk_level (0 - 100 scale), company features, and context about the comapny and industry.
 
-Your task: Provide a 2-3 sentence justification explaining WHY this risk_level makes sense based on the features.
+Your task: Provide a 2-3 sentence justification explaining WHY this risk_level makes sense based on the features and context.
 
 Features available: funding_raised, layoff_count, type_of_company, country, industry, company_name, additional_info
 
 Note that not all features are available for all companies.
 
-Guidelines:
-- If risk_level is 0-30: emphasize stability factors
-- If risk_level is 30-70: mention mixed signals 
-- If risk_level is 70-100: highlight concerning indicators
-- Be conservative - don't overstate beyond what the data suggests
-- If key features are missing, mention this limits the analysis
-
-Format: "Based on [specific features], the risk level of X.X appears reasonable because [reasoning]."
+Do NOT repeat the features, values of features, or risk level you are given. Explain as if the user has not seen the data you have seen. Provide insightful analysis, "
 """
 
-def getSummary(risk_level, features):
-    information = f"Risk level: {risk_level}\nFeatures: {features}"
+def get_summary(risk_level, features, context):
+    information = f"Risk level: {risk_level}\nFeatures: {features}\nContext: {context}"
     message = client.messages.create(
     model="claude-sonnet-4-20250514",
     max_tokens=1000,

@@ -2,17 +2,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 import sqlite3
 import json
 from prompts_claude import *
-from pydantic import BaseModel
-from typing import Optional
-
-
-class Features(BaseModel):
-    company_name: str
-    layoff_count: Optional[int]
-    funding_raised: Optional[int]
-    type_of_company: Optional[str]
-    country: Optional[str]
-    industry: Optional[str]
+from features_model import Features
 
 def read_articles(articles):
     with open("meta_articles.txt", "w", encoding="utf-8") as f:
@@ -58,14 +48,15 @@ def get_articles_by_company(company_name, db_path="articles.db"):
 def get_features(company_name):
     articles = get_articles_by_company(company_name)
 
+    summary = summarize_articles(articles, company_name)
+
     with ThreadPoolExecutor(max_workers=30) as executor:
         features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
 
     features_json = combine_features(features_list)
-    features_json["company_name"] = company_name
 
     final_features = Features(**features_json)
-    return final_features
+    return final_features, summary
        
 if __name__ == "__main__":
     print(get_features("meta"))
