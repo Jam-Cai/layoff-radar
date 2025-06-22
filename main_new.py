@@ -1,8 +1,12 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from typing import List
 import asyncio
 from pydantic import BaseModel
 from server.summaryLLM.summary import getSummary
+
+from scrape import *
+from get_features import *
 
 app = FastAPI(title="Layoff Risk Factor", description="A FastAPI application to predict layoff risk factor")
 
@@ -12,20 +16,22 @@ async def root():
 
 @app.get("/scrape")
 async def run_scrape():
-    await scrape()
+    scrape_articles()
+    return JSONResponse({"body": "Articles scraped"})
 
 @app.get("/layoffs/{company_name}")
-async def get_layoff_by_company(company_name: str):
-    features: Features = { "layoff_count": 100, "funding_raised": 1000000, "type_of_company": "startup", "country": "USA", "industry": "technology", "company_name": company_name }#getFeatures(company_name)
-    riskFactor =  69 #await model(features)
-    summary = getSummary(riskFactor, features)
+async def get_layoffs_by_company(company_name: str):
+    features: Features = get_features(company_name)
 
-    return {**features, "riskFactor": riskFactor, "summary": summary}
+    return JSONResponse(features.model_dump(mode="json"))
 
-class Features(BaseModel):
-    layoff_count: int
-    funding_raised: int
-    type_of_company: str
-    country: str
-    industry: str
-    company_name: str
+    # riskFactor = await model.run(features)
+    # summary = await getSummary(company_name, features)
+    # return {**features, "riskFactor": riskFactor}
+
+
+# @app.get("/summary/{company_name}")
+# async def get_summary(company_name: str):
+#     features: Features = await getFeatures(company_name)
+#     summary = await getSummary(company_name, features)
+#     return summary
