@@ -1,8 +1,5 @@
 from fastapi import FastAPI, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import JSONResponse
-from typing import List
-import asyncio
-from pydantic import BaseModel
 from summary import get_summary
 
 from scrape import *
@@ -67,9 +64,9 @@ async def layoffs(websocket: WebSocket, company_name: str):
 async def layoffs_test(company_name: str):
     features, context = get_features(company_name)
 
-    summary = get_summary(50, features, context)
-
     risk_level = predict(features)
+
+    summary = get_summary(risk_level, features, context)
 
 
     return JSONResponse({"risk_level": risk_level,

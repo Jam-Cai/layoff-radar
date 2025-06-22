@@ -184,3 +184,4 @@ def combine_features(features_list):
         return json.loads(response.content[0].text)
     except Exception as e:
         return fix_json(response.content[0].text)
+    
