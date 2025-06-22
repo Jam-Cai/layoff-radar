@@ -16,7 +16,7 @@ import { parseExplanation } from '@/lib/parser';
 
 const Dashboard = () => {
   const [company, setCompany] = useState('');
-  const [searchValue, setSearchValue] = useState('meta');
+  const [searchValue, setSearchValue] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
   const [recentLookups, setRecentLookups] = useState<string[]>(getRecentLookups());
@@ -54,9 +54,9 @@ const Dashboard = () => {
     document.documentElement.classList.toggle('dark');
   };
   
-  useEffect(() => {
-    handleSearch('meta');
-  }, []);
+  // useEffect(() => {
+  //   handleSearch('meta');
+  // }, []);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>

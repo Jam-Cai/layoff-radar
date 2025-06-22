@@ -8,7 +8,7 @@ client = anthropic.Anthropic(api_key=os.getenv("CLAUDE_KEY"))
 
 def fix_json(json_string):
     response = client.messages.create(
-        model="claude-sonnet-4-20250514", 
+        model="claude-3-5-haiku-20241022", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -31,7 +31,7 @@ def fix_json(json_string):
 
 def extract_companies(article_text):
     response = client.messages.create(
-        model="claude-sonnet-4-20250514", 
+        model="claude-3-5-haiku-20241022", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -63,7 +63,7 @@ def extract_companies(article_text):
 
 def summarize_articles(articles_text, company):
     response = client.messages.create(
-        model="claude-sonnet-4-20250514", 
+        model="claude-3-5-haiku-20241022", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -106,7 +106,7 @@ def extract_features(company_name, article):
     #     log10_Funds_Raised: int
 
     response = client.messages.create(
-        model="claude-sonnet-4-20250514", 
+        model="claude-3-5-haiku-20241022", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -152,7 +152,7 @@ def combine_features(features_list):
     joined_features = "\n".join(features_list)
 
     response = client.messages.create(
-        model="claude-sonnet-4-20250514", 
+        model="claude-3-5-haiku-20241022", 
         max_tokens=1024,
         temperature=0,
         messages=[

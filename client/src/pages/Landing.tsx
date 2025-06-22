@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Search, Shield, Zap, Database } from 'lucide-react';
+import { Search, Shield, Zap, Database, Waves, SmilePlus, User, Users, UserCheck, UserCog, Bot } from 'lucide-react';
 import { SiPython, SiReact, SiFastapi, SiTailwindcss, SiTypescript } from "react-icons/si";
 import { useTypingAnimation } from '@/hooks/use-typing-animation';
 
@@ -97,7 +97,10 @@ const Landing = () => {
                   </p>
                 </Card>
 
-                <Card className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow bg-white/60 backdrop-blur-md">
+                <Card className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow bg-rose-200/50 backdrop-blur-md">
+                  <div className="w-12 h-12 bg-rose-200/50 rounded-lg flex items-center justify-center mb-4">
+                    <Waves className="w-6 h-6 text-rose-600" />
+                  </div>
                   <h3 className="text-xl font-semibold mb-3">How was Farsight.fyi built?</h3>
                   <div className="flex items-center space-x-4 text-gray-700">
                     <SiPython size={24} title="Python" />
@@ -105,17 +108,29 @@ const Landing = () => {
                     <SiReact size={24} title="React" />
                     <SiTypescript size={24} title="TypeScript" />
                     <SiTailwindcss size={24} title="Tailwind CSS" />
+                    <Bot size={24} className="text-purple-600" />
                   </div>
                 </Card>
                 
-                <Card className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow bg-white/60 backdrop-blur-md">
+                <Card className="p-6 border-0 shadow-lg hover:shadow-xl transition-shadow bg-purple-200/50 backdrop-blur-md">
                   <div className="w-12 h-12 bg-purple-200/50 rounded-lg flex items-center justify-center mb-4">
-                    <Database className="w-6 h-6 text-purple-600" />
+                    <SmilePlus className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">Data-driven Insights</h3>
-                  <p className="text-gray-600">
-                    We leverage state-of-the-art models to analyze vast amounts of data, ensuring you get the most reliable and up-to-date information.
-                  </p>
+                  <h3 className="text-xl font-semibold mb-3">Developed and Designed by</h3>
+                  <div className="flex flex-wrap gap-3 justify-center">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                      <User className="w-8 h-8" />
+                    </div>
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                      <Users className="w-8 h-8" />
+                    </div>
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                      <UserCheck className="w-8 h-8" />
+                    </div>
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                      <UserCog className="w-8 h-8" />
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>

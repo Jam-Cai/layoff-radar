@@ -45,6 +45,9 @@ def get_articles_by_company(company_name, db_path="articles.db"):
     conn.close()
     return matching_articles
 
+def get_articles_by_industry(company_name):
+    
+
 def get_features(company_name):
     articles = get_articles_by_company(company_name)
 
@@ -59,8 +62,9 @@ def get_features(company_name):
         features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
 
     features_json = combine_features(features_list)
-
+    print(features_json)
     final_features = Features(**features_json)
+    
     return final_features, summary, combined_key_factors
        
 

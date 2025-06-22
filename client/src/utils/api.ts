@@ -1,22 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
+import { io, Socket } from 'socket.io-client';
 
 interface LayoffData {
   risk_level: number;
   explanation: string;
+  key_points?: [string, string][];
 }
 
 interface AnalysisStatus {
-  status: 'processing' | 'complete' | 'error';
   message: string;
-  progress?: number;
-  risk_level?: number;
-  explanation?: string;
 }
 
-interface AnalysisResponse {
-  analysis_id: string;
+interface AnalysisError {
   message: string;
-  status: string;
+}
+
+interface AnalysisComplete {
+  risk_level: number;
+  explanation: string;
+  key_points: [string, string][];
+  complete: boolean;
 }
 
 export const useRiskData = () => {
@@ -24,53 +27,66 @@ export const useRiskData = () => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
   const [progress, setProgress] = useState<number>(0);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const socketRef = useRef<Socket | null>(null);
 
-  const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+  const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://127.0.0.1:8000';
 
-  const stopPolling = () => {
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
-    }
-  };
+  const connectSocket = () => {
+    if (!socketRef.current) {
+      socketRef.current = io(SOCKET_URL, {
+        transports: ['websocket', 'polling'],
+        autoConnect: true,
+      });
 
-  const pollAnalysisStatus = async (analysisId: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/analysis/${analysisId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch analysis status');
-      }
+      // Socket event listeners
+      socketRef.current.on('connect', () => {
+        console.log('Connected to WebSocket server');
+      });
 
-      const statusData: AnalysisStatus = await response.json();
-      
-      setStatus(statusData.message);
-      if (statusData.progress !== undefined) {
-        setProgress(statusData.progress);
-      }
+      socketRef.current.on('disconnect', () => {
+        console.log('Disconnected from WebSocket server');
+      });
 
-      if (statusData.status === 'complete') {
+      socketRef.current.on('status', (data: AnalysisStatus) => {
+        setStatus(data.message);
+        // Update progress based on status message
+        if (data.message.includes('Step 1')) {
+          setProgress(20);
+        } else if (data.message.includes('Step 2')) {
+          setProgress(40);
+        } else if (data.message.includes('Step 3')) {
+          setProgress(60);
+        } else if (data.message.includes('Step 4')) {
+          setProgress(80);
+        } else if (data.message.includes('Step 5')) {
+          setProgress(90);
+        }
+      });
+
+      socketRef.current.on('analysis_complete', (data: AnalysisComplete) => {
         setData({
-          risk_level: statusData.risk_level!,
-          explanation: statusData.explanation!,
+          risk_level: Math.floor(data.risk_level),
+          explanation: data.explanation,
+          key_points: data.key_points,
         });
         setLoading(false);
         setStatus('');
-        setProgress(0);
-        stopPolling();
-      } else if (statusData.status === 'error') {
-        console.error('Analysis error:', statusData.message);
+        setProgress(100);
+      });
+
+      socketRef.current.on('error', (data: AnalysisError) => {
+        console.error('Analysis error:', data.message);
         setLoading(false);
         setStatus('');
         setProgress(0);
-        stopPolling();
-      }
-    } catch (error) {
-      console.error('Error polling analysis status:', error);
-      setLoading(false);
-      setStatus('');
-      setProgress(0);
-      stopPolling();
+      });
+    }
+  };
+
+  const disconnectSocket = () => {
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+      socketRef.current = null;
     }
   };
 
@@ -80,29 +96,12 @@ export const useRiskData = () => {
       setStatus('');
       setData(null);
       setProgress(0);
-      stopPolling();
 
-      // Start analysis
-      const response = await fetch(`${API_BASE_URL}/analyze/${encodeURIComponent(company)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // Ensure socket is connected
+      connectSocket();
 
-      if (!response.ok) {
-        throw new Error('Failed to start analysis');
-      }
-
-      const analysisResponse: AnalysisResponse = await response.json();
-      
-      // Start polling for status updates
-      pollingIntervalRef.current = setInterval(() => {
-        pollAnalysisStatus(analysisResponse.analysis_id);
-      }, 1000); // Poll every second
-
-      // Initial status check
-      await pollAnalysisStatus(analysisResponse.analysis_id);
+      // Emit the analysis request
+      socketRef.current?.emit('analyze_company', { company_name: company });
 
     } catch (error) {
       console.error('Error starting analysis:', error);
@@ -114,8 +113,10 @@ export const useRiskData = () => {
 
   // Cleanup on unmount
   useEffect(() => {
+    connectSocket();
+    
     return () => {
-      stopPolling();
+      disconnectSocket();
     };
   }, []);
 
