@@ -1,39 +1,60 @@
 import anthropic
 import os
+from dotenv import load_dotenv
+import time
+
+load_dotenv()
 
 client = anthropic.Anthropic(
-  # defaults to os.environ.get("ANTHROPIC_API_KEY")
-  api_key=os.getenv("CLAUDE_KEY"),
+  api_key=os.getenv("ANTHROPIC_API_KEY"),
 )
 
-message_batch = client.messages.batches.create(
-    requests=[
+header = """
+You are analyzing layoff risk for companies. You'll receive a risk_level (0 - 100 scale) and company features.
+
+Your task: Provide a 2-3 sentence justification explaining WHY this risk_level makes sense based on the features.
+
+Features available: funding_raised, layoff_count, type_of_company, country, industry, company_name, additional_info
+
+Note that not all features are available for all companies.
+
+Guidelines:
+- If risk_level is 0-30: emphasize stability factors
+- If risk_level is 30-70: mention mixed signals 
+- If risk_level is 70-100: highlight concerning indicators
+- Be conservative - don't overstate beyond what the data suggests
+- If key features are missing, mention this limits the analysis
+
+Format: "Based on [specific features], the risk level of X.X appears reasonable because [reasoning]."
+"""
+
+def summerize(risk_level, features):
+    information = f"Risk level: {risk_level}\nFeatures: {features}"
+    message = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=1000,
+    temperature=1,
+    system=header,
+    messages=[
         {
-            "custom_id": "first-prompt-in-my-batch",
-            "params": {
-                "model": "claude-3-5-haiku-20241022",
-                "max_tokens": 100,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Hey Claude, tell me a short fun fact about video games!",
-                    }
-                ],
-            },
-        },
-        {
-            "custom_id": "second-prompt-in-my-batch",
-            "params": {
-                "model": "claude-sonnet-4-20250514",
-                "max_tokens": 100,
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": "Hey Claude, tell me a short fun fact about bees!",
-                    }
-                ],
-            },
-        },
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": information
+                }
+            ]
+        }
     ]
-)
-print(message_batch)
+    )
+    return message.content[0].text
+
+print(summerize(50, """
+company_name: Oda Oslo Food
+layoff_count: 150
+funding_raised: 691.0 million
+country: Norway
+type_of_company: Food delivery/grocery
+industry: Food & Beverage
+additional_info: Layoff date: 2024-06-05
+"""))

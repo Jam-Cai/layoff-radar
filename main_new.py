@@ -21,6 +21,12 @@ async def get_layover_by_company(company_name: str):
 
     return {**features, "riskFactor": riskFactor}
 
+@app.get("/summary/{company_name}")
+async def get_summary(company_name: str):
+    features: Features = await getFeatures(company_name)
+    summary = await getSummary(company_name, features)
+    return summary
+
 class Features(BaseModel):
     layoff_count: int
     funding_raised: int
