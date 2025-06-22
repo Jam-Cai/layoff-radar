@@ -1,42 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Moon, Sun, Search, ChevronDown } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import RiskGauge from '@/components/RiskGauge';
 import FactorCards from '@/components/FactorCards';
 import ShapChart from '@/components/ShapChart';
 import SparklineChart from '@/components/SparklineChart';
-import { useRiskData } from '@/hooks/useRiskData';
+import { useRiskData } from '@/utils/api';
 import { getRecentLookups, saveToRecentLookups } from '@/lib/storage';
+import { parseExplanation } from '@/lib/parser';
 
 const Dashboard = () => {
   const [company, setCompany] = useState('');
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState('meta');
   const [darkMode, setDarkMode] = useState(false);
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
   const [recentLookups, setRecentLookups] = useState<string[]>(getRecentLookups());
 
-  const { data, loading, error, fetchRiskData } = useRiskData();
+  const { data, loading, status, progress, fetchRiskData } = useRiskData();
+
+  const parsedData = useMemo(() => {
+    if (data?.explanation) {
+      return parseExplanation(data.explanation);
+    }
+    return null;
+  }, [data?.explanation]);
 
   const handleSearch = async (searchCompany: string) => {
     if (!searchCompany.trim()) return;
     
     try {
-      await fetchRiskData(searchCompany);
+      fetchRiskData(searchCompany);
       setCompany(searchCompany);
       const updated = saveToRecentLookups(searchCompany);
       setRecentLookups(updated);
-      setSearchValue('');
     } catch (err) {
-      toast({
-        title: "Error",
-        description: "Company not found or API error occurred",
-        variant: "destructive"
-      });
+      toast.error("Company not found or API error occurred");
     }
   };
 
@@ -50,6 +53,10 @@ const Dashboard = () => {
     setDarkMode(!darkMode);
     document.documentElement.classList.toggle('dark');
   };
+  
+  useEffect(() => {
+    handleSearch('meta');
+  }, []);
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
@@ -59,10 +66,10 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">LR</span>
+                <span className="text-white font-bold text-sm">Fs</span>
               </div>
               <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                Layoff Radar
+                Farsight.fyi
               </h1>
             </div>
             <Button
@@ -132,13 +139,20 @@ const Dashboard = () => {
 
         {/* Dashboard Content */}
         {loading && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="col-span-full">
-              <Skeleton className="h-64 w-full rounded-xl" />
-            </div>
-            <Skeleton className="h-32 rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
-            <Skeleton className="h-32 rounded-xl" />
+          <div className="space-y-8">
+            <Card className="p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-4">Analyzing {company}...</h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-6">{status}</p>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 mb-4">
+                  <div 
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{progress}% complete</p>
+              </div>
+            </Card>
           </div>
         )}
 
@@ -148,22 +162,22 @@ const Dashboard = () => {
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
-                  <RiskGauge risk={data.risk} company={company} />
+                  <RiskGauge risk={data.risk_level ?? 0} company={company} />
                 </Card>
               </div>
               <div>
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl h-full">
-                  <SparklineChart history={null} />
+                  <SparklineChart history={parsedData?.history ?? []} />
                 </Card>
               </div>
             </div>
 
             {/* Factor Cards */}
-            <FactorCards factors={data.top_factors} />
+            <FactorCards factors={parsedData?.factors ?? []} />
 
             {/* SHAP Chart */}
             <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
-              <ShapChart factors={data.top_factors} />
+              <ShapChart factors={parsedData?.factors ?? []} />
             </Card>
 
             {/* Explanation */}
@@ -181,7 +195,7 @@ const Dashboard = () => {
                 <CollapsibleContent className="px-6 pb-6">
                   <div className="prose dark:prose-invert max-w-none">
                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {data.explanation}
+                      {parsedData?.summary || data.explanation}
                     </p>
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -192,17 +206,6 @@ const Dashboard = () => {
                 </CollapsibleContent>
               </Collapsible>
             </Card>
-          </div>
-        )}
-
-        {Error && (
-          <div className="text-center py-12">
-            <div className="text-red-500 text-lg mb-4">
-              Unable to fetch company data
-            </div>
-            <p className="text-gray-500 dark:text-gray-400">
-              Please try again or check the company name
-            </p>
           </div>
         )}
       </main>

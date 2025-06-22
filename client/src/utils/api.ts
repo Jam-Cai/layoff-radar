@@ -1,85 +1,123 @@
-import { useState, useEffect } from 'react';
-import { io, Socket } from 'socket.io-client';
+import { useState, useEffect, useRef } from 'react';
 
 interface LayoffData {
   risk_level: number;
   explanation: string;
 }
 
-interface StatusMessage {
+interface AnalysisStatus {
+  status: 'processing' | 'complete' | 'error';
   message: string;
+  progress?: number;
+  risk_level?: number;
+  explanation?: string;
 }
 
-interface AnalysisComplete {
-  risk_level: number;
-  explanation: string;
-  complete: boolean;
-}
-
-interface ErrorMessage {
+interface AnalysisResponse {
+  analysis_id: string;
   message: string;
+  status: string;
 }
 
 export const useRiskData = () => {
   const [data, setData] = useState<LayoffData | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+  const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
-  useEffect(() => {
-    // Initialize Socket.IO connection
-    const newSocket = io(API_BASE_URL, {
-      transports: ['websocket', 'polling']
-    });
-
-    newSocket.on('connect', () => {
-      console.log('Connected to server');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from server');
-    });
-
-    newSocket.on('status', (data: StatusMessage) => {
-      setStatus(data.message);
-    });
-
-    newSocket.on('analysis_complete', (data: AnalysisComplete) => {
-      setData({
-        risk_level: data.risk_level,
-        explanation: data.explanation,
-      });
-      setLoading(false);
-      setStatus('');
-    });
-
-    newSocket.on('error', (data: ErrorMessage) => {
-      console.error('Socket error:', data.message);
-      setLoading(false);
-      setStatus('');
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.close();
-    };
-  }, [API_BASE_URL]);
-
-  const fetchRiskData = async (company: string) => {
-    if (!socket) {
-      console.error('Socket not connected');
-      return;
+  const stopPolling = () => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
     }
-
-    setLoading(true);
-    setStatus('');
-    setData(null);
-
-    socket.emit('analyze_company', { company_name: company });
   };
 
-  return { data, loading, status, fetchRiskData };
+  const pollAnalysisStatus = async (analysisId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/analysis/${analysisId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch analysis status');
+      }
+
+      const statusData: AnalysisStatus = await response.json();
+      
+      setStatus(statusData.message);
+      if (statusData.progress !== undefined) {
+        setProgress(statusData.progress);
+      }
+
+      if (statusData.status === 'complete') {
+        setData({
+          risk_level: statusData.risk_level!,
+          explanation: statusData.explanation!,
+        });
+        setLoading(false);
+        setStatus('');
+        setProgress(0);
+        stopPolling();
+      } else if (statusData.status === 'error') {
+        console.error('Analysis error:', statusData.message);
+        setLoading(false);
+        setStatus('');
+        setProgress(0);
+        stopPolling();
+      }
+    } catch (error) {
+      console.error('Error polling analysis status:', error);
+      setLoading(false);
+      setStatus('');
+      setProgress(0);
+      stopPolling();
+    }
+  };
+
+  const fetchRiskData = async (company: string) => {
+    try {
+      setLoading(true);
+      setStatus('');
+      setData(null);
+      setProgress(0);
+      stopPolling();
+
+      // Start analysis
+      const response = await fetch(`${API_BASE_URL}/analyze/${encodeURIComponent(company)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start analysis');
+      }
+
+      const analysisResponse: AnalysisResponse = await response.json();
+      
+      // Start polling for status updates
+      pollingIntervalRef.current = setInterval(() => {
+        pollAnalysisStatus(analysisResponse.analysis_id);
+      }, 1000); // Poll every second
+
+      // Initial status check
+      await pollAnalysisStatus(analysisResponse.analysis_id);
+
+    } catch (error) {
+      console.error('Error starting analysis:', error);
+      setLoading(false);
+      setStatus('');
+      setProgress(0);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, []);
+
+  return { data, loading, status, progress, fetchRiskData };
 };

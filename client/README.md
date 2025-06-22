@@ -1,5 +1,4 @@
-
-# Layoff Radar Dashboard
+# Farsight.fyi Dashboard
 
 A responsive, AI-powered dashboard for analyzing company layoff risks. Built with React, Vite, TypeScript, and Tailwind CSS.
 

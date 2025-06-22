@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -18,7 +17,13 @@ const ShapChart: React.FC<ShapChartProps> = ({ factors }) => {
     absValue: Math.abs(factor.value)
   }));
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface CustomTooltipProps {
+    active?: boolean;
+    payload?: { value: number }[];
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
       const value = payload[0].value;
       return (
@@ -38,39 +43,45 @@ const ShapChart: React.FC<ShapChartProps> = ({ factors }) => {
       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
         SHAP Factor Analysis
       </h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          data={data}
-          layout="horizontal"
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-          <XAxis
-            type="number"
-            domain={[-0.5, 0.5]}
-            axisLine={false}
-            tickLine={false}
-            className="text-gray-600 dark:text-gray-400"
-          />
-          <YAxis
-            type="category"
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            className="text-gray-600 dark:text-gray-400"
-            width={120}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.value >= 0 ? '#ef4444' : '#10b981'}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {data.length > 0 ? (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={data}
+            layout="horizontal"
+            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+            <XAxis
+              type="number"
+              domain={[-0.5, 0.5]}
+              axisLine={false}
+              tickLine={false}
+              className="text-gray-600 dark:text-gray-400"
+            />
+            <YAxis
+              type="category"
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              className="text-gray-600 dark:text-gray-400"
+              width={120}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.value >= 0 ? '#ef4444' : '#10b981'}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      ) : (
+        <div className="flex items-center justify-center h-[300px] text-gray-500">
+          No factor data available to display.
+        </div>
+      )}
       <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
         <span className="inline-flex items-center mr-4">
           <div className="w-3 h-3 bg-red-500 rounded mr-2"></div>
