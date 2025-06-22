@@ -14,7 +14,7 @@ print("=== Starting FastAPI application ===")
 app = FastAPI(title="Layoff Risk Factor", description="A FastAPI application to predict layoff risk factor")
 
 # Create Socket.IO server
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
+sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*', )
 socket_app = socketio.ASGIApp(sio, app)
 
 print("=== Socket.IO server created ===")
@@ -64,9 +64,12 @@ async def analyze_company(sid, data):
 
         print(f"=== Step 1: Finding information about {company_name}... ===")
         await sio.emit('status', {'message': f"Step 1: Finding information about {company_name}..."}, room=sid)
-        articles = get_articles_by_company(company_name)
-        print(f"=== Found {len(articles)} articles ===")
+        articles = get_articles_by_company(company_name)[:600000]
+        joined_articles = "\n\n".join(article["content"] for article in articles)
+        articles = joined_articles[:300000]  
 
+        print(f"=== Found {len(articles)} articles ===")
+        
         print(f"=== Step 2: Extracting information... ===")
         await sio.emit('status', {'message': f"Step 2: Extracting information..."}, room=sid)
         with ThreadPoolExecutor(max_workers=30) as executor:
@@ -81,6 +84,7 @@ async def analyze_company(sid, data):
         summary = summary_json["summary"]
         key_points = summary_json["key_points"]
         impacts = summary_json["impact"]
+        
         combined_key_factors = [[kp, imp] for kp, imp in zip(key_points, impacts)]
         print(f"=== Combined key factors: {combined_key_factors} ===")
 

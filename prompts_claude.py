@@ -113,7 +113,7 @@ def extract_features(company_name, article):
             {
                 "role": "user",
                 "content": (
-                    f"Extract the structured data about {company_name} from the article. Respond ONLY with a JSON object matching the prefilled format.\n"
+                    f"Extract the structured data about {company_name} from the articles. Respond ONLY with a JSON object matching the prefilled format.\n"
                     f"Use the following context to answer the query:\n"
                     f"If information is not avalible for any of these, leave them as an empty string\n"
                     f"Location_HQ: where the company is headquatered, must be a string\n"

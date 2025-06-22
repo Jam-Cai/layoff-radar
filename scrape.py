@@ -127,7 +127,7 @@ def get_article_text(link):
         return f"[REQUEST FAILED] {e}"
 
 def process_articles(articles):
-    with ThreadPoolExecutor(max_workers=30) as executor:
+    with ThreadPoolExecutor(max_workers=100) as executor:
         texts = list(executor.map(get_article_text, [a["link"] for a in articles]))
 
     print("got article texts")    
@@ -174,7 +174,29 @@ def dump_table_contents(table_name):
 def scrape_articles():
     setup_database()
      
-    searches = ["tech layoffs", "tech scandals", "tech companies"]
+    searches = ["tech layoffs", "tech scandals", "tech companies", "company layoffs", "tech layoffs",
+    "software industry layoffs",
+    "AI job losses",
+    "cloud computing layoffs",
+    "data science job trends",
+    "machine learning layoffs",
+    "fintech layoffs",
+    "cybersecurity job cuts",
+    "semiconductor industry layoffs",
+    "robotics sector job reductions",
+    "IT services downsizing",
+    "tech hiring slowdown",
+    "developer job market 2025",
+    "tech support layoffs",
+    "blockchain industry layoffs",
+    "e-commerce tech layoffs",
+    "gaming industry job cuts",
+    "enterprise tech job trends",
+    "startup layoffs 2025",
+    "tech layoffs economic impact",
+    "automobile layoffs"]
+
+
 
     articles = []
     for s in searches:

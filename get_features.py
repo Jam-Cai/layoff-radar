@@ -45,10 +45,14 @@ def get_articles_by_company(company_name, db_path="articles.db"):
     conn.close()
     return matching_articles
 
+def get_articles_by_industry(company_name):
     
 
 def get_features(company_name):
-    articles = get_articles_by_company(company_name)
+    articles = get_articles_by_company(company_name)[:600000]
+
+    joined_articles = "\n\n".join(article["content"] for article in articles)
+    articles = joined_articles[:300000]  # or a bit less for safety
 
     summary_json = summarize_articles(articles, company_name)
     summary = summary_json["summary"]
@@ -57,8 +61,10 @@ def get_features(company_name):
     
     combined_key_factors = [[kp, imp] for kp, imp in zip(key_points, impacts)]
 
-    with ThreadPoolExecutor(max_workers=30) as executor:
-        features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
+    # with ThreadPoolExecutor(max_workers=30) as executor:
+    #     features_list = list(executor.map(extract_features, [company_name] * len(articles), articles))
+
+    features_list = extract_features(company_name, articles)
 
     features_json = combine_features(features_list)
     print(features_json)
