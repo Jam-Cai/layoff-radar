@@ -5,7 +5,7 @@ const socket = io("http://localhost:8000");
 
 socket.on("connect", () => {
   console.log("✔ connected", socket.id);
-  socket.emit("analyze_company", { company_name: "Meta" });
+  socket.emit("analyze_company", { company_name: "openai" });
 });
 
 socket.on("status",  d => console.log("status:", d));
