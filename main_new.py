@@ -101,9 +101,3 @@ async def layoffs_test(company_name: str):
 
 # Export the Socket.IO app for ASGI
 app = socket_app
-
-# @app.get("/summary/{company_name}")
-# async def get_summary(company_name: str):
-#     features: Features = await getFeatures(company_name)
-#     summary = await getSummary(company_name, features)
-#     return summary
