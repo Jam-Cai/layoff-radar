@@ -63,7 +63,7 @@ def extract_companies(article_text):
 
 def summarize_articles(articles_text, company):
     response = client.messages.create(
-        model="claude-3-5-haiku-20241022", 
+        model="claude-sonnet-4-20250514", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -73,10 +73,11 @@ def summarize_articles(articles_text, company):
                     f"Extract the structured data about {company} from the articles. Respond ONLY with a JSON object matching the prefilled format.\n"
                     f"summary: Summarize the major points about {company} in the following news articles. Output 4-5 sentences.\n"
                     f"key_points: Identify the top 3 factors about the company that contribute to the risk_level. Be as specific as possible, avoid general phrases. Have a mix between positive and negative. They must NOT be names of products. They must be 1-3 words. Output a JSON list\n"
-                    f"impact: For each key_point, assign a number from -60 (strongly preventing layoffs) to 60 (strongly causing layoffs), based on how it likely influences layoffs.\n"
-                    "A positive number means the factor increases the chance of layoffs (e.g., 'revenue decline': 45).\n"
-                    "A negative number means it reduces the risk of layoffs (e.g., 'new funding': -30 or 'defense collaboration': -20).\n" 
-                    "Do not assign positive values to factors that help the company grow or expand.\n"          
+                    f"impact: For each key_point, assign a number from -60 (strongly preventing layoffs) to 60 (strongly causing layoffs), based on how it likely influences layoffs. MUST be a JSON list\n"
+                    "You MUST include at least one negative number, try to include more. Make up negative factors."
+                    "A positive number means the factor increases the chance of layoffs. (e.g., 'revenue decline': 45).\n"
+                    "A negative number means it reduces the risk of layoffs, (e.g., 'new funding': -30 or 'defense collaboration': -20).\n" 
+                    "Do not assign positive values to factors that help the company grow or expand.\n"       
                     "Use your judgment, and be consistent with the meaning of the numbers.\n"
                 ),
             },

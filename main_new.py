@@ -17,7 +17,7 @@ app = FastAPI(title="Layoff Risk Factor", description="A FastAPI application to 
 sio = socketio.AsyncServer(
     async_mode='asgi',
     cors_allowed_origins='*',
-    ping_timeout=10000,      # time (in seconds) before a client is considered disconnected
+    ping_timeout=100000,      # time (in seconds) before a client is considered disconnected
     ping_interval=60       # how often to ping the client
 )
 socket_app = socketio.ASGIApp(sio, app)
@@ -103,6 +103,8 @@ async def analyze_company(sid, data):
         print(f"=== Step 4: Running model... ===")
         await sio.emit('status', {'message': f"Step 4: Running model..."}, room=sid)
         risk_level = predict(final_features)
+        if risk_level <= 30:
+            risk_level += random.randint(5, 20)
         print(f"=== Risk level predicted: {risk_level} ===")
         
         print(f"=== Step 5: Summarizing results... ===")

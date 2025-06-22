@@ -159,16 +159,10 @@ const Dashboard = () => {
         {data && !loading && (
           <div className="space-y-8">
             {/* Risk Gauge and Sparkline */}
-            <div className="grid gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-2">
+            <div className="w-full flex justify-center px-4 py-8">
+              <div className="w-full max-w-4xl">
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
                   <RiskGauge risk={data.risk_level ?? 0} company={company} />
-                </Card>
-              </div>
-              <div>
-                <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl h-full">
-                  {/* <SparklineChart history={parsedData?.history ?? []} /> */}
-                  <SparklineChart history={[]} />
                 </Card>
               </div>
             </div>
@@ -212,12 +206,6 @@ const Dashboard = () => {
               </Collapsible>
             </Card>
 
-            {/* SHAP Chart */}
-            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
-              {/* <ShapChart factors={parsedData?.factors ?? []} /> */}
-              <ShapChart factors={[]} /> 
-            </Card>
-
             
           </div>
         )}
@@ -230,10 +218,6 @@ const Dashboard = () => {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Powered by</p>
             <div className="flex flex-wrap justify-center items-center gap-6 opacity-60">
               <span className="text-sm font-medium">Anthropic</span>
-              <span className="text-sm font-medium">Google</span>
-              <span className="text-sm font-medium">Groq</span>
-              <span className="text-sm font-medium">Fetch AI</span>
-              <span className="text-sm font-medium">Vapi</span>
             </div>
           </div>
         </div>
