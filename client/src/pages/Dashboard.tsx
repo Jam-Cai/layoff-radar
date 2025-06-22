@@ -12,7 +12,7 @@ import ShapChart from '@/components/ShapChart';
 import SparklineChart from '@/components/SparklineChart';
 import { useRiskData } from '@/utils/api';
 import { getRecentLookups, saveToRecentLookups } from '@/lib/storage';
-import { parseExplanation } from '@/lib/parser';
+// import { parseExplanation } from '@/lib/parser';
 
 const Dashboard = () => {
   const [company, setCompany] = useState('');
@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   const parsedData = useMemo(() => {
     if (data?.explanation) {
-      return parseExplanation(data.explanation);
+      return data;
     }
     return null;
   }, [data?.explanation]);
@@ -167,20 +167,25 @@ const Dashboard = () => {
               </div>
               <div>
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl h-full">
-                  <SparklineChart history={parsedData?.history ?? []} />
+                  {/* <SparklineChart history={parsedData?.history ?? []} /> */}
+                  <SparklineChart history={[]} />
                 </Card>
               </div>
             </div>
 
             {/* Factor Cards */}
-            <FactorCards factors={parsedData?.factors ?? []} />
-
-            {/* SHAP Chart */}
-            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
-              <ShapChart factors={parsedData?.factors ?? []} />
-            </Card>
-
-            {/* Explanation */}
+            <FactorCards
+                factors={
+                  parsedData?.key_points
+                    ? parsedData.key_points.map(([name, value]) => ({
+                        name,
+                        value: Number(value), // ensure it's a number
+                      }))
+                    : []
+                }
+              />
+              
+              {/* Explanation */}
             <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
               <Collapsible open={isExplanationOpen} onOpenChange={setIsExplanationOpen}>
                 <CollapsibleTrigger asChild>
@@ -195,7 +200,7 @@ const Dashboard = () => {
                 <CollapsibleContent className="px-6 pb-6">
                   <div className="prose dark:prose-invert max-w-none">
                     <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {parsedData?.summary || data.explanation}
+                      {data.explanation}
                     </p>
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -206,6 +211,14 @@ const Dashboard = () => {
                 </CollapsibleContent>
               </Collapsible>
             </Card>
+
+            {/* SHAP Chart */}
+            <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
+              {/* <ShapChart factors={parsedData?.factors ?? []} /> */}
+              <ShapChart factors={[]} /> 
+            </Card>
+
+            
           </div>
         )}
       </main>

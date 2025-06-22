@@ -14,7 +14,12 @@ print("=== Starting FastAPI application ===")
 app = FastAPI(title="Layoff Risk Factor", description="A FastAPI application to predict layoff risk factor")
 
 # Create Socket.IO server
-sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*', )
+sio = socketio.AsyncServer(
+    async_mode='asgi',
+    cors_allowed_origins='*',
+    ping_timeout=10000,      # time (in seconds) before a client is considered disconnected
+    ping_interval=60       # how often to ping the client
+)
 socket_app = socketio.ASGIApp(sio, app)
 
 print("=== Socket.IO server created ===")

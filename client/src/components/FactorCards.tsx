@@ -14,7 +14,9 @@ interface FactorCardsProps {
 
 const FactorCards: React.FC<FactorCardsProps> = ({ factors }) => {
   return (
-    <div className="grid gap-4 md:grid-cols-3">
+    <>
+    <h1>Top Factors Affecting Score</h1>
+    <div className="grid gap-4 md:grid-cols-3"> 
       {factors.map((factor, index) => (
         <Card
           key={index}
@@ -33,7 +35,7 @@ const FactorCards: React.FC<FactorCardsProps> = ({ factors }) => {
                     <ArrowDown className="h-4 w-4 mr-1" />
                   )}
                   <span className="font-semibold">
-                    {Math.abs(factor.value * 100).toFixed(0)}%
+                    {Math.abs(factor.value).toFixed(0)}%
                   </span>
                 </div>
               </div>
@@ -41,13 +43,14 @@ const FactorCards: React.FC<FactorCardsProps> = ({ factors }) => {
             <div className={`w-2 h-12 rounded-full ${factor.value >= 0 ? 'bg-red-500' : 'bg-green-500'}`}>
               <div
                 className="w-full bg-current rounded-full transition-all duration-500"
-                style={{ height: `${Math.abs(factor.value) * 100}%` }}
+                style={{ height: `${Math.abs(factor.value)}%` }}
               />
             </div>
           </div>
         </Card>
       ))}
     </div>
+    </>
   );
 };
 

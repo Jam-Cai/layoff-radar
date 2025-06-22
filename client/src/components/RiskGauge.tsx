@@ -7,25 +7,25 @@ interface RiskGaugeProps {
 
 const RiskGauge: React.FC<RiskGaugeProps> = ({ risk, company }) => {
   const getRiskColor = (risk: number) => {
-    if (risk < 40) return 'text-green-500';
+    if (risk < 30) return 'text-green-500';
     if (risk < 70) return 'text-yellow-500';
     return 'text-red-500';
   };
 
   const getRiskColorBg = (risk: number) => {
-    if (risk < 40) return 'from-green-400 to-green-600';
+    if (risk < 30) return 'from-green-400 to-green-600';
     if (risk < 70) return 'from-yellow-400 to-yellow-600';
     return 'from-red-400 to-red-600';
   };
 
   const getRiskLevel = (risk: number) => {
-    if (risk < 40) return 'Low Risk';
+    if (risk < 30) return 'Low Risk';
     if (risk < 70) return 'Medium Risk';
     return 'High Risk';
   };
 
   const getStrokeColor = (risk: number) => {
-    if (risk < 40) return '#10b981'; // green
+    if (risk < 30) return '#10b981'; // green
     if (risk < 70) return '#f59e0b'; // yellow
     return '#ef4444'; // red
   };
