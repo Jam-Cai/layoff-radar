@@ -48,13 +48,3 @@ def getSummary(risk_level, features):
     ]
     )
     return message.content[0].text
-
-print(getSummary(50, """
-company_name: Oda Oslo Food
-layoff_count: 150
-funding_raised: 691.0 million
-country: Norway
-type_of_company: Food delivery/grocery
-industry: Food & Beverage
-additional_info: Layoff date: 2024-06-05
-"""))

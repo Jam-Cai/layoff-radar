@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from typing import List
 import asyncio
 from pydantic import BaseModel
-from server.summaryLLM.summary import getSummary
+from summary import getSummary
 
 from scrape import *
 from get_features import *
