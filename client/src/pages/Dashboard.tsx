@@ -154,7 +154,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl h-full">
-                  <SparklineChart history={data.history} />
+                  <SparklineChart history={null} />
                 </Card>
               </div>
             </div>
@@ -196,7 +196,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {error && (
+        {Error && (
           <div className="text-center py-12">
             <div className="text-red-500 text-lg mb-4">
               Unable to fetch company data
