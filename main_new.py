@@ -57,7 +57,11 @@ async def analyze_company(sid, data):
             features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
 
         await sio.emit('status', {'message': f"Step 3: Consolidating information..."}, room=sid)
-        summary = summarize_articles(articles, company_name)
+        summary_json = summarize_articles(articles, company_name)
+        summary = summary_json["summary"]
+        key_points = summary_json["key_points"]
+        impacts = summary_json["impact"]
+        combined_key_factors = [[kp, imp] for kp, imp in zip(key_points, impacts)]
 
         features_json = combine_features(features_list)
         features_json["company_name"] = company_name
@@ -68,11 +72,12 @@ async def analyze_company(sid, data):
         risk_level = predict(final_features)
         
         await sio.emit('status', {'message': f"Step 5: Summarizing results..."}, room=sid)
-        result_summary = get_summary(risk_level, final_features, summary)
+        result_summary = get_summary(risk_level, final_features, summary, combined_key_factors)
 
         await sio.emit('analysis_complete', {
             "risk_level": risk_level,
             "explanation": result_summary,
+            "key_points": combined_key_factors,
             "complete": True
         }, room=sid)
 
