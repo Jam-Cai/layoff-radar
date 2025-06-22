@@ -12,7 +12,7 @@ class LayoverBase(BaseModel):
     company_name: Optional[str] = None
     risk_level: Optional[float] = None
     additional_info: Optional[str] = None
-    explaination: Optional[str] = None
+    explanation: Optional[str] = None
 
 class addLayover(LayoverBase):
     pass

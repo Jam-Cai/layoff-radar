@@ -28,7 +28,7 @@ Guidelines:
 Format: "Based on [specific features], the risk level of X.X appears reasonable because [reasoning]."
 """
 
-def summerize(risk_level, features):
+def getSummary(risk_level, features):
     information = f"Risk level: {risk_level}\nFeatures: {features}"
     message = client.messages.create(
     model="claude-sonnet-4-20250514",
@@ -49,7 +49,7 @@ def summerize(risk_level, features):
     )
     return message.content[0].text
 
-print(summerize(50, """
+print(getSummary(50, """
 company_name: Oda Oslo Food
 layoff_count: 150
 funding_raised: 691.0 million

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
@@ -29,6 +29,9 @@ class Layover(Base):
     country = Column(String)
     industry = Column(String)
     company_name = Column(String)
+    risk_level = Column(Float)
+    additional_info = Column(String)
+    explanation = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 # Dependency to get database session
