@@ -4,6 +4,7 @@ Scripts/
 Include/
 pyvenv.cfg
 pip-selfcheck.json
+venv/
 
 # Python
 __pycache__/
