@@ -70,14 +70,32 @@ def summarize_articles(articles_text, company):
             {
                 "role": "user",
                 "content": (
-                    f"Summarize the major points about {company} in the following news articles. Output 4-5 sentences. "
+                    f"Extract the structured data about {company} from the article. Respond ONLY with a JSON object matching the prefilled format.\n"
+                    f"summary: Summarize the major points about {company} in the following news articles. Output 4-5 sentences.\n"
+                    f"key_points: Identify the top 3 factors about the company that may relate to layoffs. MUST be 1 or 2 words. Output a JSON list\n"
+                    f"impact: Quantify, as a number ranging from -60 to 60, how much impact the 3 factors have respectively, with -60 being a very strong anti-layoff impact. Output a JSON list of integers."
                     f"Article:\n\n {articles_text}"
                 )
             },
+            {
+                "role": "assistant",
+                "content": '''{
+                    "summary": "",
+                    "key_points": [],
+                    "impact": [],
+                }'''
+            },
+            {
+                "role": "user",
+                "content": f"Extract: \n\n{articles_text}"
+            }
         ]
     )
 
-    return response.content[0].text
+    try:
+        return json.loads(response.content[0].text)
+    except Exception as e:
+        return fix_json(response.content[0].text)
 
 def extract_features(company_name, article):
     # class Features(BaseModel):

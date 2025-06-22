@@ -62,15 +62,19 @@ async def layoffs(websocket: WebSocket, company_name: str):
 
 @app.post("/layoffs_test/{company_name}")
 async def layoffs_test(company_name: str):
-    features, context = get_features(company_name)
+    features, context, key_points = get_features(company_name)
+    print(features)
+    print(context)
+    print(key_points)
 
     risk_level = predict(features)
 
-    summary = get_summary(risk_level, features, context)
+    summary = get_summary(risk_level, features, context, key_points)
 
 
     return JSONResponse({"risk_level": risk_level,
-                         "explaination": summary})
+                         "explaination": summary,
+                         "key_points": key_points})
 
 
     

@@ -48,7 +48,14 @@ def get_articles_by_company(company_name, db_path="articles.db"):
 def get_features(company_name):
     articles = get_articles_by_company(company_name)
 
-    summary = summarize_articles(articles, company_name)
+    summary_json = summarize_articles(articles, company_name)
+    summary = summary_json["summary"]
+    key_points = summary_json["key_points"]
+    impacts = summary_json["impact"]
+    
+    combined_key_factors = [[kp, imp] for kp, imp in zip(key_points, impacts)]
+
+
 
     with ThreadPoolExecutor(max_workers=30) as executor:
         features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
@@ -56,7 +63,7 @@ def get_features(company_name):
     features_json = combine_features(features_list)
 
     final_features = Features(**features_json)
-    return final_features, summary
+    return final_features, summary, combined_key_factors
        
 if __name__ == "__main__":
     print(get_features("meta"))
