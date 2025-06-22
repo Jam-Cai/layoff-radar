@@ -45,7 +45,6 @@ def get_articles_by_company(company_name, db_path="articles.db"):
     conn.close()
     return matching_articles
 
-def get_articles_by_industry(company_name):
     
 
 def get_features(company_name):

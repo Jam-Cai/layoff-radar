@@ -70,10 +70,10 @@ def summarize_articles(articles_text, company):
             {
                 "role": "user",
                 "content": (
-                    f"Extract the structured data about {company} from the article. Respond ONLY with a JSON object matching the prefilled format.\n"
+                    f"Extract the structured data about {company} from the articles. Respond ONLY with a JSON object matching the prefilled format.\n"
                     f"summary: Summarize the major points about {company} in the following news articles. Output 4-5 sentences.\n"
-                    f"key_points: Identify the top 3 factors about the company that may relate to layoffs. MUST be 1 or 2 words. Output a JSON list\n"
-                    f"impact: Quantify, as a number ranging from -60 to 60, how much impact the 3 factors have respectively, with -60 being a very strong anti-layoff impact. Output a JSON list of integers."
+                    f"key_points: Identify the top 3 factors about the company that relate to layoffs. Be as specific as possible, avoid general phrases. Have a mix between positive and negative. They must NOT be names of products. They MUST be 1 or 2 words. Output a JSON list\n"
+                    f"impact: For the three key_points, generate a number from -60 (strongly preventing layoffs) to 60 (strongly causing layoffs) representing how each key_point affects layoffs. Make sure the key_point makes sense with being positive or negative. Output a JSON list of integers."
                     f"Article:\n\n {articles_text}"
                 )
             },

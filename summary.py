@@ -18,7 +18,7 @@ Features available: funding_raised, layoff_count, type_of_company, country, indu
 
 Note that not all features are available for all companies.
 
-Do NOT repeat the features, values of features, or risk level you are given. Explain as if the user has not seen the data you have seen. Provide insightful and non-superficial analysis."
+Do NOT repeat the features, values of features, or risk level you are given. Do NOT give background information about the company or overexplain its role or provide recommendations for the company. Explain as if the user has not seen the data you have seen. Provide insightful and non-superficial analysis."
 """
 
 def get_summary(risk_level, features, context, key_points):

@@ -72,8 +72,8 @@ async def analyze_company(sid, data):
         
         print(f"=== Step 2: Extracting information... ===")
         await sio.emit('status', {'message': f"Step 2: Extracting information..."}, room=sid)
-        with ThreadPoolExecutor(max_workers=30) as executor:
-            features_list = list(executor.map(extract_features, [company_name] * len(articles), [a["content"] for a in articles]))
+        features_list = extract_features(company_name, articles)
+
         print(f"=== Extracted features from {len(features_list)} articles ===")
 
         print(f"=== Step 3: Consolidating information... ===")
