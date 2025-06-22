@@ -40,12 +40,12 @@ const FactorCards: React.FC<FactorCardsProps> = ({ factors }) => {
                 </div>
               </div>
             </div>
-            <div className={`w-2 h-12 rounded-full ${factor.value >= 0 ? 'bg-red-500' : 'bg-green-500'}`}>
-              <div
-                className="w-full bg-current rounded-full transition-all duration-500"
-                style={{ height: `${Math.abs(factor.value)}%` }}
-              />
-            </div>
+              <div className="relative w-2 h-32 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className={`absolute bottom-0 w-full rounded-full transition-all duration-500 ${factor.value >= 0 ? 'bg-red-500' : 'bg-green-500'}`}
+                  style={{ height: `${Math.min(Math.abs(factor.value), 100)}%` }}
+                />
+              </div>
           </div>
         </Card>
       ))}
