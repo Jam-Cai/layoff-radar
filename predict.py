@@ -14,12 +14,12 @@ def predict(features: Features):
     return prediction[0]
 
 
-# if __name__ == "__main__":
-#     features = Features(
-#         Location_HQ="USA",
-#         Industry="Tech",
-#         Stage="Seed",
-#         Year=2020,
-#         log10_Funds_Raised=10
-#     )
-#     print(predict(features))
+if __name__ == "__main__":
+    features = Features(
+        Location_HQ="Google",
+        Industry="Tech",
+        Stage="Stage 1",
+        Year=2020,
+        log10_Funds_Raised=10
+    )
+    print(predict(features))

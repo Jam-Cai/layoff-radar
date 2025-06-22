@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardFooter } from '@/components/ui/card';
 import { Search, Shield, Zap, Database, Waves, SmilePlus, User, Users, UserCheck, UserCog, Bot } from 'lucide-react';
 import { SiPython, SiReact, SiFastapi, SiTailwindcss, SiTypescript } from "react-icons/si";
 import { useTypingAnimation } from '@/hooks/use-typing-animation';
@@ -116,19 +116,21 @@ const Landing = () => {
                   <div className="w-12 h-12 bg-purple-200/50 rounded-lg flex items-center justify-center mb-4">
                     <SmilePlus className="w-6 h-6 text-purple-600" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-3">Developed and Designed by</h3>
-                  <div className="flex flex-wrap gap-3 justify-center">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                      <User className="w-8 h-8" />
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                      <Users className="w-8 h-8" />
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                      <UserCheck className="w-8 h-8" />
-                    </div>
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
-                      <UserCog className="w-8 h-8" />
+                  <h3 className="text-xl font-semibold mb-3">Meet the Team</h3>
+                  <div className="mt-8">
+                    <div className="flex flex-wrap gap-4 justify-center">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <img src="/author.jpeg" alt="Author" className="w-full h-full rounded-full object-cover" />
+                      </div>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <img src="/author1.jpeg" alt="Author" className="w-full h-full rounded-full object-cover" />
+                      </div>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <img src="/author2.jpeg" alt="Author" className="w-full h-full rounded-full object-cover" />
+                      </div>
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer">
+                        <img src="/author3.jpeg" alt="Author" className="w-full h-full rounded-full object-cover" />
+                      </div>
                     </div>
                   </div>
                 </Card>
