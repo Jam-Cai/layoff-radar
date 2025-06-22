@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Moon, Sun, Search, ChevronDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import RiskGauge from '@/components/RiskGauge';
 import FactorCards from '@/components/FactorCards';
 import ShapChart from '@/components/ShapChart';
 import SparklineChart from '@/components/SparklineChart';
-import { useRiskData } from '@/utils/api';
+import { useRiskData } from '@/hooks/useRiskData';
 import { getRecentLookups, saveToRecentLookups } from '@/lib/storage';
 
 const Dashboard = () => {
@@ -21,7 +20,7 @@ const Dashboard = () => {
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
   const [recentLookups, setRecentLookups] = useState<string[]>(getRecentLookups());
 
-  const { data, loading, fetchRiskData } = useRiskData();
+  const { data, loading, error, fetchRiskData } = useRiskData();
 
   const handleSearch = async (searchCompany: string) => {
     if (!searchCompany.trim()) return;
@@ -149,7 +148,7 @@ const Dashboard = () => {
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="lg:col-span-2">
                 <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
-                  <RiskGauge risk={data.risk_level} company={company} />
+                  <RiskGauge risk={data.risk} company={company} />
                 </Card>
               </div>
               <div>
@@ -159,13 +158,13 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Factor Cards
+            {/* Factor Cards */}
             <FactorCards factors={data.top_factors} />
 
-            SHAP Chart
+            {/* SHAP Chart */}
             <Card className="p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
               <ShapChart factors={data.top_factors} />
-            </Card> */}
+            </Card>
 
             {/* Explanation */}
             <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-gray-200 dark:border-gray-700 rounded-xl">
