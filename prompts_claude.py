@@ -100,6 +100,7 @@ def summarize_articles(articles_text, company):
         return json.loads(response.content[0].text)
     except Exception as e:
         return fix_json(response.content[0].text)
+        
 
 def extract_features(company_name, article):
     # class Features(BaseModel):
@@ -110,7 +111,7 @@ def extract_features(company_name, article):
     #     log10_Funds_Raised: int
 
     response = client.messages.create(
-        model="claude-3-5-haiku-20241022", 
+        model="claude-sonnet-4-20250514", 
         max_tokens=1024,
         temperature=0,
         messages=[
@@ -176,7 +177,7 @@ def combine_features(features_list):
                     "}\n\n"
                     "Below is a list of these JSON objects from different articles. Your job is to analyze them and generate a single, best-estimate JSON object for the company. "
                     "If most entries are blank, infer reasonable values based on the ones that have data. For ambiguous or conflicting values, choose the most frequently occurring or most complete value. "
-                    "Use common sense and consistency when merging. Ensure the result uses the same structure:\n\n"
+                    "Use common sense and consistency when merging. log10_Funds_Raised and Year MUST be integers, enter 0 only if entirely unsure. Ensure the result uses the same structure:\n\n"
                     "{\n"
                     '  "Location_HQ": "",\n'
                     '  "Industry": "",\n'

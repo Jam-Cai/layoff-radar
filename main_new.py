@@ -17,7 +17,7 @@ app = FastAPI(title="Layoff Risk Factor", description="A FastAPI application to 
 sio = socketio.AsyncServer(
     async_mode='asgi',
     cors_allowed_origins='*',
-    ping_timeout=100000,      # time (in seconds) before a client is considered disconnected
+    ping_timeout=500000,      # time (in seconds) before a client is considered disconnected
     ping_interval=60       # how often to ping the client
 )
 socket_app = socketio.ASGIApp(sio, app)
@@ -69,21 +69,20 @@ async def analyze_company(sid, data):
 
         print(f"=== Step 1: Finding information about {company_name}... ===")
         await sio.emit('status', {'message': f"Step 1: Finding information about {company_name}..."}, room=sid)
-        articles = get_articles_by_company(company_name)[:600000]
-        joined_articles = "\n\n".join(article["content"] for article in articles)
-        articles = joined_articles[:300000]  
+        articles_list = get_articles_by_company(company_name)
+        full_text = "\n\n".join(article["content"] for article in articles_list)[:300000]  
 
-        print(f"=== Found {len(articles)} articles ===")
+        print(f"=== Found {len(articles_list)} articles ===")
         
         print(f"=== Step 2: Extracting information... ===")
         await sio.emit('status', {'message': f"Step 2: Extracting information..."}, room=sid)
-        features_list = extract_features(company_name, articles)
+        features_list = extract_features(company_name, full_text)
 
         print(f"=== Extracted features from {len(features_list)} articles ===")
 
         print(f"=== Step 3: Consolidating information... ===")
         await sio.emit('status', {'message': f"Step 3: Consolidating information..."}, room=sid)
-        summary_json = summarize_articles(articles, company_name)
+        summary_json = summarize_articles(full_text, company_name)
         print(f"=== Summary JSON: {summary_json} ===")
         
         summary = summary_json["summary"]
@@ -103,8 +102,9 @@ async def analyze_company(sid, data):
         print(f"=== Step 4: Running model... ===")
         await sio.emit('status', {'message': f"Step 4: Running model..."}, room=sid)
         risk_level = predict(final_features)
-        if risk_level <= 30:
-            risk_level += random.randint(5, 20)
+        if risk_level <= 29.5:
+            risk_level += random.randint(0, 20)
+            risk_level -= random.randint(0, 7)
         print(f"=== Risk level predicted: {risk_level} ===")
         
         print(f"=== Step 5: Summarizing results... ===")
